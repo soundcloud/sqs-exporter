@@ -146,12 +146,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.4.3</version>
+				<version>3.2.4</version>
 				<dependencies>
 					<dependency>
-						<groupId>com.github.edwgiz</groupId>
-						<artifactId>maven-shade-plugin.log4j2-cachefile-transformer</artifactId>
-						<version>2.8.1</version>
+						<groupId>io.github.edwgiz</groupId>
+						<artifactId>log4j-maven-shade-plugin-extensions</artifactId>
+						<version>2.17.1</version>
 					</dependency>
 				</dependencies>
 				<executions>
@@ -167,7 +167,7 @@
 									<mainClass>org.jmal98.sqs.exporter.Application</mainClass>
 								</transformer>
 								<transformer
-									implementation="com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer">
+									implementation="io.github.edwgiz.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformer">
 								</transformer>
 							</transformers>
 							<finalName>exporter</finalName>
@@ -175,9 +175,17 @@
 								<filter>
 									<artifact>*:*</artifact>
 									<excludes>
-										<exclude>META-INF/*.SF</exclude>
-										<exclude>META-INF/*.DSA</exclude>
-										<exclude>META-INF/*.RSA</exclude>
+										<exclude>META-INF/*</exclude>
+										<exclude>about.html</exclude>
+										<exclude>module-info.class</exclude>
+									</excludes>
+								</filter>
+								<filter>
+									<artifact>com.fasterxml.jackson.dataformat:jackson-dataformat-cbor</artifact>
+									<excludes>
+										<!-- This fixes overlapping between jackson-core-2.12.3.jar and jackson-dataformat-cbor-2.12.3.jar -->
+										<!-- in META-INF/services/com.fasterxml.jackson.core.JsonFactory -->
+										<exclude>META-INF/services/*.JsonFactory</exclude>
 									</excludes>
 								</filter>
 							</filters>
@@ -237,7 +245,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -254,31 +261,39 @@
 			<dependency>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-servlet</artifactId>
-				<version>9.4.11.v20180605</version>
+				<version>9.4.44.v20210927</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.prometheus</groupId>
 				<artifactId>simpleclient_servlet</artifactId>
-				<version>0.4.0</version>
+				<version>0.11.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.prometheus</groupId>
 				<artifactId>simpleclient_hotspot</artifactId>
-				<version>0.4.0</version>
+				<version>0.11.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.prometheus</groupId>
 				<artifactId>simpleclient_log4j2</artifactId>
-				<version>0.4.0</version>
+				<version>0.11.0</version>
+			</dependency>
+
+			<!-- Explicitly specify commons-codec version -->
+			<!-- due to dependency convergence error in com.amazonaws:aws-java-sdk-sqs:1.12.137 -->
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.15</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.amazonaws</groupId>
 				<artifactId>aws-java-sdk-bom</artifactId>
-				<version>1.11.360</version>
+				<version>1.12.137</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
